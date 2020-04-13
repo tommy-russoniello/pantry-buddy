@@ -18,6 +18,9 @@ gem 'rails', '~> 6.0.2', '>= 6.0.2.1'
 # This is to get `rails console` working in macOS Sierra
 gem 'rb-readline', '~> 0.5.5'
 
+# HTTP client
+gem 'rest-client', '~> 2.0.2'
+
 # Use SCSS for stylesheets
 gem 'sass-rails', '>= 6'
 
