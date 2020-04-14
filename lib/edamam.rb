@@ -1,14 +1,14 @@
 module Edamam
   APP_ID = ENV.fetch('EDAMAM_APP_ID')
   APP_KEY = ENV.fetch('EDAMAM_APP_KEY')
-  MEASUREMENT_URI = 'http://www.edamam.com/ontologies/edamam.owl#Measure_tablespoon'.freeze
+  MEASUREMENT_URI = 'http://www.edamam.com/ontologies/edamam.owl#Measure_gram'.freeze
   NUTRITION_DATA_URL = 'https://api.edamam.com/api/food-database/nutrients'.freeze
   UPC_LOOKUP_URL = 'https://api.edamam.com/api/food-database/parser'.freeze
 
   class << self
-    def get_nutrition_data(upc)
+    def get_nutrition_data_from_upc(upc)
       food_id = send_request(method: :get, name: 'UPC lookup', url: "#{UPC_LOOKUP_URL}?upc=#{upc}")
-        &.fetch('hints', nil)
+        &.dig('hints')
         &.first
         &.dig('food', 'foodId')
 
@@ -22,35 +22,30 @@ module Edamam
         method: :post,
         name: 'nutrition data',
         url: NUTRITION_DATA_URL
-      )['totalNutrients']
+      )&.dig('totalNutrients')
 
       return unless nutrients
 
       data = nutrient_mappings.map do |nutrient, code|
         nutrient_data = nutrients[code]
         if nutrient_data
-          value = cast_decimal(nutrient_data['quantity'])
-          gram_multiplier =
+          value =
             case nutrient_data['unit']
             when 'g'
-              1
+              cast_decimal(nutrient_data['quantity'])
             when 'mg'
-              1_000
+              cast_decimal(nutrient_data['quantity']) * 1_000
             when 'µg'
-              1_000_000
+              cast_decimal(nutrient_data['quantity']) * 1_000_000
+            else
+              nil
             end
-
-          value = gram_multiplier ? value * gram_multiplier : nil
         end
 
         [nutrient, value]
       end.to_h
 
-      data[:calories] = cast_decimal(nutrients.dig('ENERC_KCAL', 'quantity'))
-      equivalent_folate = cast_decimal(nutrients.dig('FOLDFE', 'quantity'))
-      food_folate = cast_decimal(nutrients.dig('FOLFD', 'quantity'))
-      data[:folate] = equivalent_folate && food_folate ? equivalent_folate + food_folate : nil
-      data
+      data.merge(calories: cast_decimal(nutrients.dig('ENERC_KCAL', 'quantity')))
     end
 
     private
@@ -112,7 +107,7 @@ module Edamam
         end
 
       message = error_response || error.message
-      Rails.logger.error("Edamam#{' ' if action.present?}#{action} error: #{message}")
+      Rails.logger.error("Edamam#{' ' if name.present?}#{name} error: #{message}")
 
       nil
     rescue JSON::ParserError

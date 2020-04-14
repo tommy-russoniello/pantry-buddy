@@ -10,93 +10,76 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_10_000000) do
+ActiveRecord::Schema.define(version: 2020_04_10_010000) do
 
-  create_table "brands", force: :cascade do |t|
+  create_table "health_labels", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["name"], name: "index_brands_on_name", unique: true
   end
 
-  create_table "item_families", force: :cascade do |t|
-    t.integer "item_family_id"
-    t.string "name", null: false
+  create_table "item_health_labels", force: :cascade do |t|
+    t.integer "health_label_id", null: false
+    t.integer "item_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["item_family_id"], name: "index_item_families_on_item_family_id"
-    t.index ["name"], name: "index_item_families_on_name", unique: true
+    t.index ["health_label_id", "item_id"], name: "index_item_health_labels_on_health_label_id_and_item_id", unique: true
+    t.index ["item_id", "health_label_id"], name: "index_item_health_labels_on_item_id_and_health_label_id"
   end
 
-  create_table "item_quantity_units", force: :cascade do |t|
+  create_table "item_measurement_units", force: :cascade do |t|
     t.integer "grams", null: false
     t.string "item_id", null: false
-    t.integer "quantity_unit_id", null: false
+    t.integer "measurement_unit_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["item_id", "quantity_unit_id"], name: "index_item_quantity_units_on_item_id_and_quantity_unit_id", unique: true
+    t.index ["item_id", "measurement_unit_id"], name: "ix_item_measurement_units_on_item_id_and_measurement_unit_id", unique: true
   end
 
   create_table "items", force: :cascade do |t|
-    t.decimal "added_sugar", null: false
-    t.integer "brand_id"
-    t.decimal "calcium", null: false
-    t.decimal "calories", null: false
-    t.decimal "carbs", null: false
-    t.decimal "cholesterol", null: false
-    t.decimal "fat", null: false
-    t.decimal "fiber", null: false
-    t.decimal "folate", null: false
+    t.decimal "added_sugar"
+    t.decimal "calcium"
+    t.decimal "calories"
+    t.decimal "carbs"
+    t.decimal "cholesterol"
+    t.decimal "fat"
+    t.decimal "fiber"
     t.decimal "grams_per_tablespoon"
-    t.decimal "iron", null: false
-    t.integer "item_family_id"
-    t.decimal "magnesium", null: false
-    t.decimal "monounsaturated_fat", null: false
+    t.decimal "iron"
+    t.decimal "magnesium"
+    t.decimal "monounsaturated_fat"
     t.string "name", null: false
-    t.decimal "niacin", null: false
-    t.decimal "phosphorus", null: false
-    t.decimal "polyunsaturated_fat", null: false
-    t.decimal "potassium", null: false
-    t.decimal "protein", null: false
-    t.decimal "riboflavin", null: false
-    t.decimal "saturated_fat", null: false
-    t.decimal "sodium", null: false
-    t.decimal "sugar", null: false
-    t.decimal "thiamin", null: false
-    t.decimal "trans_fat", null: false
-    t.integer "variety_id"
-    t.decimal "vitamin_a", null: false
-    t.decimal "vitamin_b6", null: false
-    t.decimal "vitamin_b12", null: false
-    t.decimal "vitamin_c", null: false
-    t.decimal "vitamin_d", null: false
-    t.decimal "vitamin_e", null: false
-    t.decimal "vitamin_k", null: false
+    t.decimal "niacin"
+    t.decimal "phosphorus"
+    t.decimal "polyunsaturated_fat"
+    t.decimal "potassium"
+    t.decimal "protein"
+    t.decimal "riboflavin"
+    t.decimal "saturated_fat"
+    t.decimal "sodium"
+    t.decimal "sugar"
+    t.decimal "thiamin"
+    t.decimal "trans_fat"
+    t.decimal "vitamin_a"
+    t.decimal "vitamin_b6"
+    t.decimal "vitamin_b12"
+    t.decimal "vitamin_c"
+    t.decimal "vitamin_d"
+    t.decimal "vitamin_e"
+    t.decimal "vitamin_k"
+    t.decimal "zinc"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["brand_id"], name: "index_items_on_brand_id"
-    t.index ["item_family_id", "variety_id", "brand_id"], name: "index_items_on_item_family_id_and_variety_id_and_brand_id", unique: true
-    t.index ["variety_id"], name: "index_items_on_variety_id"
   end
 
-  create_table "quantity_units", force: :cascade do |t|
+  create_table "measurement_units", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index "\"name\", \"type??\"", name: "index_quantity_units_on_name_and_type??", unique: true
   end
 
-  create_table "varieties", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["name"], name: "index_varieties_on_name", unique: true
-  end
-
-  add_foreign_key "item_families", "item_families"
-  add_foreign_key "item_quantity_units", "items"
-  add_foreign_key "item_quantity_units", "quantity_units"
-  add_foreign_key "items", "brands"
-  add_foreign_key "items", "item_families"
-  add_foreign_key "items", "varieties"
+  add_foreign_key "item_health_labels", "health_labels"
+  add_foreign_key "item_health_labels", "items"
+  add_foreign_key "item_measurement_units", "items"
+  add_foreign_key "item_measurement_units", "measurement_units"
 end

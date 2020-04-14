@@ -1,8 +1,4 @@
 class Item < ApplicationRecord
-  belongs_to :brand
-  belongs_to :item_family
-  belongs_to :variety
-
   validates :added_sugar, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :calcium, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :calories, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
@@ -10,7 +6,6 @@ class Item < ApplicationRecord
   validates :cholesterol, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :fat, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :fiber, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :folate, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :iron, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :magnesium, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :monounsaturated_fat, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
@@ -34,8 +29,5 @@ class Item < ApplicationRecord
   validates :vitamin_e, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
   validates :vitamin_k, allow_nil: true, numericality: { greater_than_or_equal_to: 0 }
 
-  static_attribute :brand_id, alias: :brand
-  static_attribute :item_family_id, alias: :item_family
   static_attribute :name
-  static_attribute :variety_id, alias: :variety
 end
