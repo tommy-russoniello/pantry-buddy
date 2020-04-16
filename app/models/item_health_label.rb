@@ -3,5 +3,5 @@ class ItemHealthLabel < ApplicationRecord
   belongs_to :item
 
   static_attribute :health_label_id, alias: :health_label
-  static_attribute :hitem_id, alias: :item
+  static_attribute :item_id, alias: :item
 end

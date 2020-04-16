@@ -60,6 +60,7 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
     t.decimal "sugar"
     t.decimal "thiamin"
     t.decimal "trans_fat"
+    t.string "upc"
     t.decimal "vitamin_a"
     t.decimal "vitamin_b6"
     t.decimal "vitamin_b12"
@@ -70,6 +71,7 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
     t.decimal "zinc"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["upc"], name: "index_items_on_upc", unique: true
   end
 
   create_table "measurement_units", force: :cascade do |t|

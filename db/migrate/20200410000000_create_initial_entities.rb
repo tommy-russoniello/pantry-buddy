@@ -24,6 +24,7 @@ class CreateInitialEntities < ActiveRecord::Migration[6.0]
       table.decimal(:sugar)
       table.decimal(:thiamin)
       table.decimal(:trans_fat)
+      table.string(:upc)
       table.decimal(:vitamin_a)
       table.decimal(:vitamin_b6)
       table.decimal(:vitamin_b12)
@@ -33,6 +34,7 @@ class CreateInitialEntities < ActiveRecord::Migration[6.0]
       table.decimal(:vitamin_k)
       table.decimal(:zinc)
       table.timestamps
+      table.index(%i[upc], unique: true)
     end
 
     create_table(:measurement_units) do |table|
