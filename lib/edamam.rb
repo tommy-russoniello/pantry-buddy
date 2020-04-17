@@ -94,8 +94,6 @@ module Edamam
               cast_decimal(nutrient_data['quantity']) / divisor * 1_000
             when 'µg'
               cast_decimal(nutrient_data['quantity']) / divisor * 1_000_000
-            else
-              nil
             end
           end
 

@@ -4,7 +4,7 @@ class ApplicationRecord < ActiveRecord::Base
   class << self
     def inherited(subclass)
       super
-      
+
       subclass.static_attribute(:created_at) if subclass.attribute_names.include?('created_at')
       subclass.static_attribute(:updated_at) if subclass.attribute_names.include?('updated_at')
     end

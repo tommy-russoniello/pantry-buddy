@@ -43,7 +43,7 @@ class Item < ApplicationRecord
     ]
   end
 
-  nutrients.each do
-    validates(:added_sugar, allow_nil: true, numericality: { greater_than_or_equal_to: 0 })
+  nutrients.each do |nutrient|
+    validates(nutrient, allow_nil: true, numericality: { greater_than_or_equal_to: 0 })
   end
 end
