@@ -1,9 +1,10 @@
 module Edamam
+  API_HOST = 'api.edamam.com'.freeze
   APP_ID = ENV.fetch('EDAMAM_APP_ID')
   APP_KEY = ENV.fetch('EDAMAM_APP_KEY')
   MEASUREMENT_URI_PREFIX = 'http://www.edamam.com/ontologies/edamam.owl#Measure_'.freeze
-  NUTRITION_DATA_URL = 'https://api.edamam.com/api/food-database/nutrients'.freeze
-  UPC_LOOKUP_URL = 'https://api.edamam.com/api/food-database/parser'.freeze
+  NUTRITION_DATA_PATH = '/api/food-database/nutrients'.freeze
+  UPC_LOOKUP_PATH = '/api/food-database/parser'.freeze
 
   class << self
     def get_grams_per_measurement_unit(food_id:, measurement_name:)
@@ -12,28 +13,33 @@ module Edamam
           ingredients: [
             {
               quantity: 1,
-              measureURI: "#{MEASUREMENT_URI_PREFIX}#{measurement_name.parameterize.underscore}",
+              measureURI: measurement_uri(measurement_name),
               foodId: food_id
             }
           ]
         }.to_json,
         headers: { 'Content-Type': 'application/json' },
+        host: API_HOST,
         method: :post,
         name: 'measurement data',
-        url: NUTRITION_DATA_URL
+        path: NUTRITION_DATA_PATH
       )
-      get_weight_from_nutrition_data_response(data)
+      get_weight_from_nutrition_data_response(data)&.to_d
     end
 
     def get_nutrition_data_from_upc(upc)
-      upc_lookup_data = send_request(method: :get, name: 'UPC lookup', url: "#{UPC_LOOKUP_URL}?upc=#{upc}")
-        &.dig('hints')
-        &.first
+      upc_lookup_data = send_request(
+        host: API_HOST,
+        method: :get,
+        name: 'UPC lookup',
+        path: UPC_LOOKUP_PATH,
+        query: { upc: upc }
+      )&.dig('hints', 0)
 
-      return unless upc_lookup_data&.is_a?(Hash)
+      return unless upc_lookup_data
 
       food_data = upc_lookup_data['food']
-      return unless food_data&.is_a?(Hash)
+      return unless food_data
 
       food_id = food_data['foodId']
       name = food_data['label']
@@ -51,7 +57,7 @@ module Edamam
         ingredients: [
           {
             quantity: 1,
-            measureURI: "#{MEASUREMENT_URI_PREFIX}tablespoon",
+            measureURI: measurement_uri('tablespoon'),
             foodId: food_id
           }
         ]
@@ -59,15 +65,16 @@ module Edamam
       request_data = {
         body: body.to_json,
         headers: { 'Content-Type': 'application/json' },
+        host: API_HOST,
         method: :post,
         name: 'nutrition data',
-        url: NUTRITION_DATA_URL
+        path: NUTRITION_DATA_PATH
       }
       response = send_request(request_data)
 
       grams_per_tablespoon = get_weight_from_nutrition_data_response(response)
       unless grams_per_tablespoon
-        body[:ingredients].first[:measureURI] = "#{MEASUREMENT_URI_PREFIX}gram"
+        body[:ingredients].first[:measureURI] = measurement_uri('gram')
         request_data[:body] = body.to_json
         response = send_request(request_data)
       end
@@ -114,21 +121,12 @@ module Edamam
     end
 
     def get_weight_from_nutrition_data_response(data)
-      return unless data&.is_a?(Hash)
-
-      data = data['ingredients']
-      return unless data&.is_a?(Array)
-
-      data = data.first
-      return unless data&.is_a?(Hash)
-
-      data = data['parsed']
-      return unless data&.is_a?(Array)
-
-      data = data.first
-      return unless data&.is_a?(Hash)
-
+      data = data&.dig('ingredients', 0, 'parsed', 0)
       data['weight'] unless data['status'] == 'MISSING_QUANTITY'
+    end
+
+    def measurement_uri(measurement_name)
+      "#{MEASUREMENT_URI_PREFIX}#{measurement_name.parameterize.underscore}"
     end
 
     def nutrient_mappings
@@ -164,13 +162,17 @@ module Edamam
       }
     end
 
-    def send_request(body: nil, headers: {}, method:, name: nil, url:)
+    def send_request(body: nil, headers: {}, host:, method:, name: nil, path: '', query: {})
       ActiveSupport::JSON.decode(
         RestClient::Request.execute(
           headers: headers,
           method: method,
           payload: body,
-          url: "#{url}#{url.include?('?') ? '&' : '?'}app_id=#{APP_ID}&app_key=#{APP_KEY}"
+          url: URI::HTTPS.build(
+            host: host,
+            path: path,
+            query: query.merge(app_id: APP_ID, app_key: APP_KEY).to_query
+          ).to_s
         )
       )
     rescue RestClient::ExceptionWithResponse => error

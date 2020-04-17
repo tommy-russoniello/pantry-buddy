@@ -4,6 +4,10 @@ class MeasurementUnit < ApplicationRecord
   static_attribute :name
 
   class << self
+    def custom
+      where.not(id: standard.values)
+    end
+
     def standard
       return @standard if @standard
 

@@ -71,6 +71,7 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
     t.decimal "zinc"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_items_on_name"
     t.index ["upc"], name: "index_items_on_upc", unique: true
   end
 
@@ -78,6 +79,7 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_measurement_units_on_name", unique: true
   end
 
   add_foreign_key "item_health_labels", "health_labels"

@@ -34,12 +34,14 @@ class CreateInitialEntities < ActiveRecord::Migration[6.0]
       table.decimal(:vitamin_k)
       table.decimal(:zinc)
       table.timestamps
+      table.index(%i[name])
       table.index(%i[upc], unique: true)
     end
 
     create_table(:measurement_units) do |table|
       table.string(:name, null: false)
       table.timestamps
+      table.index(%i[name], unique: true)
     end
 
     create_table(:item_measurement_units) do |table|
@@ -66,8 +68,7 @@ class CreateInitialEntities < ActiveRecord::Migration[6.0]
       table.bigint(:health_label_id, null: false)
       table.bigint(:item_id, null: false)
       table.timestamps
-      table.index(%i[health_label_id item_id], unique: true)
-      table.index(%i[item_id health_label_id])
+      table.index(%i[item_id health_label_id], unique: true)
     end
 
     add_foreign_key(:item_health_labels, :health_labels)

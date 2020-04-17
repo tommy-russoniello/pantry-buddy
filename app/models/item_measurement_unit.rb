@@ -2,7 +2,7 @@ class ItemMeasurementUnit < ApplicationRecord
   belongs_to :item
   belongs_to :measurement_unit
 
-  validates :grams, presence: true
+  validates :grams, numericality: { greater_than: 0 }
 
   static_attribute :item_id, alias: :item
   static_attribute :grams
