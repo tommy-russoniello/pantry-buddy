@@ -39,23 +39,23 @@ MeasurementUnit.create!(
   [
     {
       id: 1,
-      name: 'Ounce'
-    },
-    {
-      id: 2,
       name: 'Gram'
     },
     {
-      id: 3,
-      name: 'Pound'
-    },
-    {
-      id: 4,
+      id: 2,
       name: 'Kilogram'
     },
     {
+      id: 3,
+      name: 'Ounce'
+    },
+    {
+      id: 4,
+      name: 'Pound'
+    },
+    {
       id: 5,
-      name: 'Pinch'
+      name: 'Milliliter'
     },
     {
       id: 6,
@@ -67,23 +67,23 @@ MeasurementUnit.create!(
     },
     {
       id: 8,
-      name: 'Gallon'
-    },
-    {
-      id: 9,
       name: 'Pint'
     },
     {
-      id: 10,
+      id: 9,
       name: 'Quart'
     },
     {
+      id: 10,
+      name: 'Gallon'
+    },
+    {
       id: 11,
-      name: 'Milliliter'
+      name: 'Teaspoon'
     },
     {
       id: 12,
-      name: 'Drop'
+      name: 'Tablespoon'
     },
     {
       id: 13,
@@ -91,11 +91,11 @@ MeasurementUnit.create!(
     },
     {
       id: 14,
-      name: 'Tablespoon'
+      name: 'Drop'
     },
     {
       id: 15,
-      name: 'Teaspoon'
+      name: 'Pinch'
     }
   ]
 )

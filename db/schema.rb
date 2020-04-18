@@ -23,8 +23,7 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
     t.integer "item_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["health_label_id", "item_id"], name: "index_item_health_labels_on_health_label_id_and_item_id", unique: true
-    t.index ["item_id", "health_label_id"], name: "index_item_health_labels_on_item_id_and_health_label_id"
+    t.index ["item_id", "health_label_id"], name: "index_item_health_labels_on_item_id_and_health_label_id", unique: true
   end
 
   create_table "item_measurement_units", force: :cascade do |t|
@@ -77,6 +76,7 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
 
   create_table "measurement_units", force: :cascade do |t|
     t.string "name", null: false
+    t.string "uri_fragment_suffix", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["name"], name: "index_measurement_units_on_name", unique: true

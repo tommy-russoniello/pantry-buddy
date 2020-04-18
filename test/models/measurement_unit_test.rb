@@ -4,12 +4,19 @@ class MeasurementUnitTest < ActiveSupport::TestCase
   def setup
     super
 
-    @new_measurement_unit = MeasurementUnit.new(name: 'new measure unit')
+    @new_measurement_unit = MeasurementUnit.new(name: 'new name', uri_fragment_suffix: 'new')
   end
 
   tests_for('create') do
     test('valid create') do
+      @new_measurement_unit.uri_fragment_suffix = nil
+
       assert(@new_measurement_unit.save, 'valid')
+      assert_equal(
+        @new_measurement_unit.name,
+        @new_measurement_unit.uri_fragment_suffix,
+        'default uri fragment suffix'
+      )
     end
 
     tests_for('invalid create') do
@@ -33,7 +40,8 @@ class MeasurementUnitTest < ActiveSupport::TestCase
       test_invalid_changes(
         :@measurement_unit,
         [
-          [:name, 'updated name', 'cannot be changed']
+          [:name, 'updated name', 'cannot be changed'],
+          [:uri_fragment_suffix, 'updated uri fragment suffix', 'cannot be changed']
         ]
       )
     end

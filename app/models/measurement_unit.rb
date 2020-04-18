@@ -1,7 +1,10 @@
 class MeasurementUnit < ApplicationRecord
+  before_create :set_default_uri_fragment_suffix
+
   validates :name, presence: true, uniqueness: { case_sensitive: false }
 
   static_attribute :name
+  static_attribute :uri_fragment_suffix
 
   class << self
     def custom
@@ -30,5 +33,11 @@ class MeasurementUnit < ApplicationRecord
       ]
       @standard = where(name: standard_names).pluck(:name, :id).to_h
     end
+  end
+
+  private
+
+  def set_default_uri_fragment_suffix
+    self.uri_fragment_suffix ||= name
   end
 end

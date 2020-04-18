@@ -7,13 +7,13 @@ module Edamam
   UPC_LOOKUP_PATH = '/api/food-database/parser'.freeze
 
   class << self
-    def get_grams_per_measurement_unit(food_id:, measurement_name:)
+    def get_grams_per_measurement_unit(food_id:, measurement:)
       data = send_request(
         body: {
           ingredients: [
             {
               quantity: 1,
-              measureURI: measurement_uri(measurement_name),
+              measureURI: measurement_uri(measurement),
               foodId: food_id
             }
           ]
@@ -47,10 +47,15 @@ module Edamam
 
       measurement_data = upc_lookup_data['measures']
       measurement_units =
-        if measurement_data&.is_a?(Array)
-          measurement_data.map { |measure| measure['label'] if measure&.is_a?(Hash) }.compact
+        if measurement_data
+          measurement_data.map do |measure|
+            match_data = measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z]+)$/)
+            next unless match_data
+
+            [measure['label'], match_data[1]]
+          end.compact.to_h
         else
-          []
+          {}
         end
 
       body = {
@@ -83,6 +88,8 @@ module Edamam
       return unless nutrients
 
       divisor = grams_per_tablespoon || 1
+      calories = cast_decimal(nutrients.dig('ENERC_KCAL', 'quantity'))
+      calories /= divisor if calories
       nutrients_data = nutrient_mappings.map do |nutrient, code|
         nutrient_data = nutrients[code]
         value =
@@ -91,14 +98,14 @@ module Edamam
             when 'g'
               cast_decimal(nutrient_data['quantity']) / divisor
             when 'mg'
-              cast_decimal(nutrient_data['quantity']) / divisor * 1_000
+              cast_decimal(nutrient_data['quantity']) / divisor / 1_000
             when 'µg'
-              cast_decimal(nutrient_data['quantity']) / divisor * 1_000_000
+              cast_decimal(nutrient_data['quantity']) / divisor / 1_000_000
             end
           end
 
         [nutrient, value]
-      end.to_h.merge(calories: cast_decimal(nutrients.dig('ENERC_KCAL', 'quantity')))
+      end.to_h.merge(calories: calories)
 
       {
         food_id: food_id,

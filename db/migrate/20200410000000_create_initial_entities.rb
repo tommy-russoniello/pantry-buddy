@@ -40,6 +40,7 @@ class CreateInitialEntities < ActiveRecord::Migration[6.0]
 
     create_table(:measurement_units) do |table|
       table.string(:name, null: false)
+      table.string(:uri_fragment_suffix, null: false)
       table.timestamps
       table.index(%i[name], unique: true)
     end
