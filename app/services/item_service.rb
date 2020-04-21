@@ -37,7 +37,7 @@ class ItemService
           ItemMeasurementUnit.create!(
             grams: Edamam.get_grams_per_measurement_unit(
               food_id: data[:food_id],
-              measurement_name: custom_measurement_unit.uri_fragment_suffix
+              measurement: custom_measurement_unit.uri_fragment_suffix
             ),
             item: item,
             measurement_unit_id: custom_measurement_unit.id

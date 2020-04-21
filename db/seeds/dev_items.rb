@@ -465,7 +465,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
       :vegan,
       :vegetarian
     ),
-    measurement_units: { Serving: 28 },
+    measurement_units: { Serving: 4 },
     name: 'Badia Garlic Powder',
     upc: '033844000011'
   }

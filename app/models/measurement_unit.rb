@@ -38,6 +38,6 @@ class MeasurementUnit < ApplicationRecord
   private
 
   def set_default_uri_fragment_suffix
-    self.uri_fragment_suffix ||= name
+    self.uri_fragment_suffix ||= name.parameterize.underscore
   end
 end

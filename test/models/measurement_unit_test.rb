@@ -13,7 +13,7 @@ class MeasurementUnitTest < ActiveSupport::TestCase
 
       assert(@new_measurement_unit.save, 'valid')
       assert_equal(
-        @new_measurement_unit.name,
+        'new_name',
         @new_measurement_unit.uri_fragment_suffix,
         'default uri fragment suffix'
       )

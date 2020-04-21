@@ -24,7 +24,7 @@ module Edamam
         name: 'measurement data',
         path: NUTRITION_DATA_PATH
       )
-      get_weight_from_nutrition_data_response(data)&.to_d
+      get_weight_from_nutrition_data_response(data)
     end
 
     def get_nutrition_data_from_upc(upc)
@@ -43,32 +43,23 @@ module Edamam
 
       food_id = food_data['foodId']
       name = food_data['label']
-      return unless food_id && name
 
       measurement_data = upc_lookup_data['measures']
-      measurement_units =
-        if measurement_data
-          measurement_data.map do |measure|
-            match_data = measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z]+)$/)
-            next unless match_data
+      measurement_units = measurement_data.map do |measure|
+        [measure['label'], measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z]+)$/)[1]]
+      end.compact.to_h
 
-            [measure['label'], match_data[1]]
-          end.compact.to_h
-        else
-          {}
-        end
-
-      body = {
-        ingredients: [
-          {
-            quantity: 1,
-            measureURI: measurement_uri('tablespoon'),
-            foodId: food_id
-          }
-        ]
-      }
+      volumetric = measurement_units.key?('Tablespoon')
       request_data = {
-        body: body.to_json,
+        body: {
+          ingredients: [
+            {
+              quantity: 1,
+              measureURI: measurement_uri(volumetric ? 'tablespoon' : 'gram'),
+              foodId: food_id
+            }
+          ]
+        }.to_json,
         headers: { 'Content-Type': 'application/json' },
         host: API_HOST,
         method: :post,
@@ -77,12 +68,7 @@ module Edamam
       }
       response = send_request(request_data)
 
-      grams_per_tablespoon = get_weight_from_nutrition_data_response(response)
-      unless grams_per_tablespoon
-        body[:ingredients].first[:measureURI] = measurement_uri('gram')
-        request_data[:body] = body.to_json
-        response = send_request(request_data)
-      end
+      grams_per_tablespoon = get_weight_from_nutrition_data_response(response) if volumetric
 
       nutrients = response['totalNutrients']
       return unless nutrients
@@ -127,7 +113,7 @@ module Edamam
 
     def get_weight_from_nutrition_data_response(data)
       data = data&.dig('ingredients', 0, 'parsed', 0)
-      data['weight'] unless data['status'] == 'MISSING_QUANTITY'
+      cast_decimal(data['weight']) unless data['status'] == 'MISSING_QUANTITY'
     end
 
     def measurement_uri(measurement_name)

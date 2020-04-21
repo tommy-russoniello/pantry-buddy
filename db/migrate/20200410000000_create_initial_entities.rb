@@ -34,7 +34,6 @@ class CreateInitialEntities < ActiveRecord::Migration[6.0]
       table.decimal(:vitamin_k)
       table.decimal(:zinc)
       table.timestamps
-      table.index(%i[name])
       table.index(%i[upc], unique: true)
     end
 
