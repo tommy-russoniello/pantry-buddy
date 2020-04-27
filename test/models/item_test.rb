@@ -20,7 +20,9 @@ class ItemTest < ActiveSupport::TestCase
           calories: 100,
           carbs: 1,
           cholesterol: 1,
+          edamam_id: 'new edamam id',
           fat: 1,
+          fdc_id: 'new fdc id',
           fiber: 1,
           iron: 1,
           magnesium: 1,
@@ -102,6 +104,7 @@ class ItemTest < ActiveSupport::TestCase
         iron: 99,
         magnesium: 99,
         monounsaturated_fat: 99,
+        name: 'updated name',
         niacin: 99,
         phosphorus: 99,
         polyunsaturated_fat: 99,
@@ -127,6 +130,20 @@ class ItemTest < ActiveSupport::TestCase
           assert(@item.save, 'valid')
         end
       end
+
+      test('valid update - edamam id') do
+        @new_item.save
+        @new_item.edamam_id = 'new edamam id'
+
+        assert(@new_item.save, 'valid')
+      end
+
+      test('valid update - fdc id') do
+        @new_item.save
+        @new_item.fdc_id = 'new fdc id'
+
+        assert(@new_item.save, 'valid')
+      end
     end
 
     tests_for('invalid update') do
@@ -138,12 +155,15 @@ class ItemTest < ActiveSupport::TestCase
           [:calories, -1, 'must be greater than or equal to 0'],
           [:carbs, -1, 'must be greater than or equal to 0'],
           [:cholesterol, -1, 'must be greater than or equal to 0'],
+          [:edamam_id, 'updated edamam id', 'cannot be changed'],
           [:fat, -1, 'must be greater than or equal to 0'],
+          [:fdc_id, 'updated fdc id', 'cannot be changed'],
           [:fiber, -1, 'must be greater than or equal to 0'],
           [:iron, -1, 'must be greater than or equal to 0'],
           [:magnesium, -1, 'must be greater than or equal to 0'],
           [:monounsaturated_fat, -1, 'must be greater than or equal to 0'],
-          [:name, 'updated name', 'cannot be changed'],
+          [:name, nil, 'can\'t be blank'],
+          [:name, '', 'can\'t be blank'],
           [:niacin, -1, 'must be greater than or equal to 0'],
           [:phosphorus, -1, 'must be greater than or equal to 0'],
           [:polyunsaturated_fat, -1, 'must be greater than or equal to 0'],

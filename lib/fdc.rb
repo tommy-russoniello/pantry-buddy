@@ -35,7 +35,7 @@ module Fdc
 
         value /= 100 if value
         [nutrient, value]
-      end.compact.to_h
+      end.compact.sort_by(&:first).to_h
 
       {
         fdc_id: data['fdcId'],

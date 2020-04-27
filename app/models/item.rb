@@ -7,7 +7,8 @@ class Item < ApplicationRecord
 
   validates :name, presence: true
 
-  static_attribute :name
+  static_attribute :edamam_id, once_set: true
+  static_attribute :fdc_id, once_set: true
   static_attribute :upc
 
   def self.nutrients
@@ -45,5 +46,9 @@ class Item < ApplicationRecord
 
   nutrients.each do |nutrient|
     validates(nutrient, allow_nil: true, numericality: { greater_than_or_equal_to: 0 })
+  end
+
+  def clear_nutrients
+    self.class.nutrients.each { |nutrient| send("#{nutrient}=", nil) }
   end
 end

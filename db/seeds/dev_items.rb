@@ -6,24 +6,30 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     calories: 7,
     carbs: 0.2,
     cholesterol: 0,
-    fat: 0.533300018310547,
-    fiber: 0.0669999980926513,
+    edamam_id: 'food_bcik3d7au66tjyae82xm7aw24scd',
+    fat: 0.5333,
+    fdc_id: '',
+    fiber: 0.067,
     grams_per_tablespoon: 15,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free, :gluten_free, :kosher, :pescatarian, :tree_nut_free, :vegan, :vegetarian
     ),
-    iron: 0.0000240000009536743,
+    iron: 0.000024,
     measurement_units: { Serving: 30 },
     name: 'ORGANIC PEANUT BUTTER',
     potassium: 0.00667,
     protein: 0.3,
     saturated_fat: 0.1,
     sodium: 0.00133,
-    sugar: 0.0667000007629393,
+    sugar: 0.0667,
+    trans_fat: 0,
+    vitamin_a: 0,
+    vitamin_c: 0,
     upc: '077890403327'
   },
   {
     calories: 2.5,
+    edamam_id: 'food_az29yd7b31wf5fawjql0ubxosw99',
     grams_per_tablespoon: 20.1596608888889,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -37,6 +43,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     ),
     measurement_units: { Package: 907, Serving: 20 },
     name: 'Smucker\'s Jam Strawberry',
+    nutrition_data_collection_failed_at: Time.zone.now,
     protein: 0,
     sodium: 0,
     sugar: 0.599999999999998,
@@ -47,31 +54,36 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     calories: 2.4,
     carbs: 0.44,
     cholesterol: 0,
+    edamam_id: 'food_bsw2g3jbb3j8jmay0s2p4bzh3mot',
     fat: 0.02,
+    fdc_id: '406258',
     fiber: 0.08,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free, :kosher, :peanut_free, :pescatarian, :tree_nut_free, :vegetarian
     ),
-    iron: 0.0000288000011444092,
+    iron: 0.0000288,
     measurement_units: { Package: 453, Serving: 25, Slice: 25 },
     monounsaturated_fat: 0,
     name: '100% WHOLE WHEAT BREAD',
-    niacin: 0.0000320000004768372,
+    niacin: 0.000032,
     polyunsaturated_fat: 0,
     protein: 0.16,
-    riboflavin: 0.00000136000007390976,
+    riboflavin: 0.00000136,
     saturated_fat: 0,
     sodium: 0.0042,
     sugar: 0,
     thiamin: 0,
     trans_fat: 0,
     upc: '072250011365',
+    vitamin_a: 0,
     vitamin_c: 0
   },
   {
     calories: 0.2,
     carbs: 0.05,
+    edamam_id: 'food_bft4kwea7hobspbfagafyb2j1gqa',
     fat: 0,
+    fdc_id: '505953',
     fiber: 0.02,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -89,10 +101,12 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     sodium: 0,
     sugar: 0.02,
     upc: '035826089519',
+    vitamin_a: 0.0000012,
     vitamin_c: 0.00078
   },
   {
     calories: 0,
+    edamam_id: 'food_aj6azkea1r54jtak6q8h3ambh6oi',
     grams_per_tablespoon: 10.7999997131673,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -106,6 +120,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     ),
     measurement_units: { Package: 21, Whole: 7 },
     name: 'Fleischmann\'s ActiveDry Yeast Original - 3 CT',
+    nutrition_data_collection_failed_at: Time.zone.now,
     protein: 0,
     sugar: 0,
     upc: '040100009282'
@@ -113,10 +128,12 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
   {
     calcium: 0,
     calories: 0.4,
-    carbs: 0.0794000005722046,
+    carbs: 0.0794,
     cholesterol: 0,
+    edamam_id: 'food_a36pjlwbp5m8d1bnj3yccayfq4n9',
     fat: 0,
-    fiber: 0.0160000002384186,
+    fdc_id: '393545',
+    fiber: 0.016,
     grams_per_tablespoon: 15.7499999997337,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -128,24 +145,27 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
       :vegan,
       :vegetarian
     ),
-    iron: 0.0000171000003814697,
+    iron: 0.0000171,
     measurement_units: { Package: 822, Serving: 63 },
     name: 'GIANT, TOMATO PUREE',
-    protein: 0.015900000333786,
+    protein: 0.0159,
     saturated_fat: 0,
     sodium: 0.00024,
-    sugar: 0.0476000022888183,
+    sugar: 0.0476,
     trans_fat: 0,
     upc: '688267080715',
-    vitamin_c: 0.0000759999990463255
+    vitamin_a: 0.00000357,
+    vitamin_c: 0.000076
   },
   {
     calcium: 0.0005,
     calories: 0.34,
-    carbs: 0.0671999979019166,
+    carbs: 0.0672,
     cholesterol: 0,
+    edamam_id: 'food_bvs5ozha0arsa7bkesi6raj68o95',
     fat: 0,
-    fiber: 0.0170000004768372,
+    fdc_id: '358170',
+    fiber: 0.017,
     grams_per_tablespoon: 29.749999999497,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -157,22 +177,25 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
       :vegan,
       :vegetarian
     ),
-    iron: 0.00000910000026226044,
+    iron: 0.0000091,
     measurement_units: { Package: 793, Serving: 119 },
     name: 'CHUNKY CRUSHED TOMATOES',
-    protein: 0.00839999973773956,
+    protein: 0.0084,
     saturated_fat: 0,
     sodium: 0.00101,
-    sugar: 0.0335999989509583,
+    sugar: 0.0336,
     trans_fat: 0,
     upc: '041188046831',
-    vitamin_c: 0.00000999999999999999
+    vitamin_a: 0.00000189,
+    vitamin_c: 0.00001
   },
   {
     calories: 3.75,
     carbs: 1,
     cholesterol: 0,
+    edamam_id: 'food_a66sbmdauqyhgzay8bc5gbm1vns7',
     fat: 0,
+    fdc_id: '555202',
     fiber: 0,
     grams_per_tablespoon: 11.9999999991885,
     health_label_ids: HealthLabel.ids.values_at(
@@ -197,6 +220,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
   {
     calories: 4,
     cholesterol: 0,
+    edamam_id: 'food_boam0b8awx156hadxanmabhfy8ua',
     fiber: 0.199999999999999,
     grams_per_tablespoon: 7.55987283282207,
     health_label_ids: HealthLabel.ids.values_at(
@@ -204,6 +228,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     ),
     measurement_units: { Package: 226, Serving: 5 },
     name: 'Kraft Parmesan Cheese Grated',
+    nutrition_data_collection_failed_at: Time.zone.now,
     protein: 0.4,
     saturated_fat: 0,
     sodium: 0.015,
@@ -211,9 +236,14 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     upc: '021000615315'
   },
   {
+    calcium: 0,
     calories: 8,
     carbs: 0,
-    fat: 0.93330001831055,
+    cholesterol: 0,
+    edamam_id: 'food_agf89dmak66ctib5jxj1rbtrto96',
+    fat: 0.9333,
+    fdc_id: '647382',
+    fiber: 0,
     grams_per_tablespoon: 14.786764781,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -225,20 +255,25 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
       :vegan,
       :vegetarian
     ),
+    iron: 0,
     measurement_units: { Package: 2_874, Serving: 14 },
-    monounsaturated_fat: 0.666699981689453,
+    monounsaturated_fat: 0.6667,
     name: 'EXTRA VIRGIN OLIVE OIL',
-    polyunsaturated_fat: 0.13329999923706,
+    polyunsaturated_fat: 0.1,
     protein: 0,
-    saturated_fat: 0.13329999923706,
+    saturated_fat: 0.1333,
     sodium: 0,
+    sugar: 0,
     trans_fat: 0,
-    upc: '688267133138'
+    upc: '688267133138',
+    vitamin_a: 0,
+    vitamin_c: 0
   },
   {
     calcium: 0.0088184904873951,
     calories: 4.99714460952389,
     carbs: 1.29337863285117,
+    edamam_id: 'food_amedxevacmhbzgbfw0c1kasiqs0u',
     fat: 0.0587899374586723,
     fiber: 0.499714474969004,
     grams_per_tablespoon: 3.401942775,
@@ -257,6 +292,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     measurement_units: { Package: 85, Serving: 3 },
     monounsaturated_fat: 0.0293949687293361,
     name: 'McCormick Pure Ground Black Pepper',
+    nutrition_data_collection_failed_at: Time.zone.now,
     polyunsaturated_fat: 0.0293949687293361,
     potassium: 0.0270433708280116,
     protein: 0.205764774535066,
@@ -269,6 +305,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     calories: 81.1536544803072,
     carbs: 0,
     cholesterol: 0,
+    edamam_id: 'food_bjhn5hvaarsgzbbfpkn51bjn76qh',
     fat: 0,
     fiber: 0,
     grams_per_tablespoon: 14.786764781,
@@ -284,6 +321,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     ),
     measurement_units: { Serving: 1 },
     name: 'Ahold Oregano Leaves',
+    nutrition_data_collection_failed_at: Time.zone.now,
     potassium: 0,
     protein: 0,
     saturated_fat: 0,
@@ -293,12 +331,14 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     upc: '688267143908'
   },
   {
-    calcium: 0.000337837837837838,
-    calories: 0.297297297297297,
-    carbs: 0.0743243243243243,
+    calcium: 0.00027,
+    calories: 0.3,
+    carbs: 0.0743,
     cholesterol: 0,
+    edamam_id: 'food_b2yk2laagzuut3a30uwr1a9d297a',
     fat: 0,
-    fiber: 0.0202702702702703,
+    fdc_id: '515462',
+    fiber: 0.02,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
       :gluten_free,
@@ -309,21 +349,24 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
       :vegan,
       :vegetarian
     ),
-    iron: 0.00000729729758726584,
+    iron: 0.0000049,
     measurement_units: { Serving: 148 },
     name: 'Yellow Onion',
     protein: 0.00682432425988687,
     saturated_fat: 0,
-    sodium: 0.000027027027027027,
-    sugar: 0.0608108108108108,
+    sodium: 0.00003,
+    sugar: 0.0608,
     trans_fat: 0,
     upc: '688267083532',
-    vitamin_c: 0.000121621621621622
+    vitamin_a: 0,
+    vitamin_c: 0.000081
   },
   {
     calories: 0,
     carbs: 0,
+    edamam_id: 'food_b3c7dvgbujj2zna9zhy1hbx2f2ig',
     fat: 0,
+    fdc_id: '402683',
     grams_per_tablespoon: 17.9999999987827,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -346,6 +389,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     calories: 3.21428571428571,
     carbs: 0.0357142857142858,
     cholesterol: 0.000535714285714286,
+    edamam_id: 'food_brk80d5a2waxsrbbe9oxxauf1la5',
     fat: 0.214285714285714,
     grams_per_tablespoon: 7.08738078113017,
     health_label_ids: HealthLabel.ids.values_at(
@@ -354,6 +398,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     iron: 0.00000250000001064369,
     measurement_units: { Package: 226, Serving: 28 },
     name: 'Kraft Mozzarella Finely Shredded Natural Cheese  8oz Bag',
+    nutrition_data_collection_failed_at: Time.zone.now,
     phosphorus: 0.0050832143511091,
     protein: 0.25,
     saturated_fat: 0.125,
@@ -367,20 +412,23 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     calories: 5,
     carbs: 0,
     cholesterol: 0.00125,
-    fat: 0.464300003051758,
+    edamam_id: 'food_ax9lud3bbmanz4bstzf0caod8gg7',
+    fat: 0.4643,
+    fdc_id: '394120',
     fiber: 0,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free, :gluten_free, :peanut_free, :pescatarian, :tree_nut_free
     ),
-    iron: 0.0000128999996185303,
+    iron: 0.0000129,
     measurement_units: { Package: 170, Serving: 28, Slice: 2 },
     name: 'HORMEL, PEPPERONI',
-    protein: 0.178600006103516,
-    saturated_fat: 0.214300003051758,
+    protein: 0.1786,
+    saturated_fat: 0.2143,
     sodium: 0.0175,
     sugar: 0,
     trans_fat: 0,
     upc: '037600398855',
+    vitamin_a: 0,
     vitamin_c: 0
   },
   {
@@ -388,6 +436,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     calories: 3.3199022662167,
     carbs: 0.788476778332386,
     cholesterol: 0,
+    edamam_id: 'food_b6s1hu4blzzhlmbdy3c05btvkcg6',
     fat: 0,
     fiber: 0.165995115784355,
     health_label_ids: HealthLabel.ids.values_at(
@@ -403,6 +452,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     iron: 0,
     measurement_units: { Package: 74, Serving: 2 },
     name: 'Mccormick Onion Powder, 2.62 Oz',
+    nutrition_data_collection_failed_at: Time.zone.now,
     potassium: 0.0099597067986501,
     protein: 0.0829975578921774,
     saturated_fat: 0,
@@ -416,6 +466,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     calories: 3.666666667,
     carbs: 0.733300018310547,
     cholesterol: 0,
+    edamam_id: 'food_bw0cysyaiwd35jaamkh62a5rplv4',
     fat: 0,
     fiber: 0.0329999995231629,
     grams_per_tablespoon: 7.4999999998732,
@@ -425,6 +476,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     iron: 0.0000359999990463257,
     measurement_units: { Package: 2_250, Serving: 30 },
     name: 'GOLD MEDAL BL EN PS AP FLOUR',
+    nutrition_data_collection_failed_at: Time.zone.now,
     potassium: 0.00133,
     protein: 1,
     riboflavin: 0.00000340000003576279,
@@ -437,6 +489,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
   },
   {
     calories: 0,
+    edamam_id: 'food_bgp8s5lawi10tmbocm9hoag985z6',
     grams_per_tablespoon: 14.786764781,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -450,10 +503,12 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     ),
     measurement_units: { Serving: 4 },
     name: 'Ahold Basil Leaves',
+    nutrition_data_collection_failed_at: Time.zone.now,
     upc: '688267015700'
   },
   {
     calories: 0,
+    edamam_id: 'food_b2edm9zbvprb3dbf8uaebbyx18qc',
     grams_per_tablespoon: 14.786764781,
     health_label_ids: HealthLabel.ids.values_at(
       :dairy_free,
@@ -467,6 +522,7 @@ measurement_unit_ids = MeasurementUnit.custom.pluck(:name, :id).to_h
     ),
     measurement_units: { Serving: 4 },
     name: 'Badia Garlic Powder',
+    nutrition_data_collection_failed_at: Time.zone.now,
     upc: '033844000011'
   }
 ].each do |data|

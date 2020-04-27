@@ -5,7 +5,7 @@ class ItemService
     def find_or_create_item_from_upc(upc)
       item = Item.find_by(upc: upc)
       if item
-        if item.food_id
+        if item.edamam_id
           date = item.nutrition_data_collection_failed_at
           return item if !date || date > NUTRITION_DATA_COLLECTION_RETRY_DURATION.ago
 
@@ -17,7 +17,7 @@ class ItemService
         item.reload
       else
         new_item = create_data_from_fdc(upc)
-        create_data_from_edamam(new_item.present? ? new_item : upc)
+        create_data_from_edamam(new_item || upc)
       end
     end
 
@@ -57,18 +57,20 @@ class ItemService
           end
 
           item ||= Item.create!(
-            grams_per_tablespoon: data[:grams_per_tablespoon],
             name: data[:name],
             upc: upc,
             **data[:nutrients]
           )
 
-          item.update!(health_label_ids: health_label_ids)
+          item.update!(
+            grams_per_tablespoon: data[:grams_per_tablespoon],
+            health_label_ids: health_label_ids
+          )
 
           custom_measurement_units.each do |custom_measurement_unit|
             ItemMeasurementUnit.create!(
               grams: Edamam.get_grams_per_measurement_unit(
-                food_id: data[:food_id],
+                edamam_id: data[:edamam_id],
                 measurement: custom_measurement_unit.uri_fragment_suffix
               ),
               item: item,
@@ -99,6 +101,7 @@ class ItemService
 
       begin
         if item
+          item.clear_nutrients
           item.update!(fdc_id: data[:fdc_id], name: data[:name], **data[:nutrients])
         else
           Item.create!(fdc_id: data[:fdc_id], name: data[:name], upc: upc, **data[:nutrients])

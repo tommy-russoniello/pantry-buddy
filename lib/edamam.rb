@@ -26,7 +26,7 @@ module Edamam
         [measure['label'], measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z]+)$/)[1]]
       end.compact.to_h
 
-      food_id = food_data['foodId']
+      edamam_id = food_data['foodId']
       volumetric = measurement_units.key?('Tablespoon')
       request_data = {
         body: {
@@ -34,7 +34,7 @@ module Edamam
             {
               quantity: 1,
               measureURI: measurement_uri(volumetric ? 'tablespoon' : 'gram'),
-              foodId: food_id
+              foodId: edamam_id
             }
           ]
         }.to_json,
@@ -73,7 +73,7 @@ module Edamam
       end
 
       data = {
-        food_id: food_id,
+        edamam_id: edamam_id,
         grams_per_tablespoon: grams_per_tablespoon,
         health_labels: response['healthLabels'],
         measurement_units: measurement_units,
@@ -84,14 +84,14 @@ module Edamam
       data
     end
 
-    def get_grams_per_measurement_unit(food_id:, measurement:)
+    def get_grams_per_measurement_unit(edamam_id:, measurement:)
       data = send_request(
         body: {
           ingredients: [
             {
               quantity: 1,
               measureURI: measurement_uri(measurement),
-              foodId: food_id
+              foodId: edamam_id
             }
           ]
         }.to_json,
