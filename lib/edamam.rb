@@ -7,6 +7,83 @@ module Edamam
   UPC_LOOKUP_PATH = '/api/food-database/parser'.freeze
 
   class << self
+    def get_data_from_upc(upc, nutrients: false)
+      upc_lookup_data = send_request(
+        host: API_HOST,
+        method: :get,
+        name: 'UPC lookup',
+        path: UPC_LOOKUP_PATH,
+        query: { upc: upc }
+      )&.dig('hints', 0)
+
+      return unless upc_lookup_data
+
+      food_data = upc_lookup_data['food']
+      return unless food_data
+
+      measurement_data = upc_lookup_data['measures']
+      measurement_units = measurement_data.map do |measure|
+        [measure['label'], measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z]+)$/)[1]]
+      end.compact.to_h
+
+      food_id = food_data['foodId']
+      volumetric = measurement_units.key?('Tablespoon')
+      request_data = {
+        body: {
+          ingredients: [
+            {
+              quantity: 1,
+              measureURI: measurement_uri(volumetric ? 'tablespoon' : 'gram'),
+              foodId: food_id
+            }
+          ]
+        }.to_json,
+        headers: { 'Content-Type': 'application/json' },
+        host: API_HOST,
+        method: :post,
+        name: 'UPC data',
+        path: NUTRITION_DATA_PATH
+      }
+      response = send_request(request_data)
+
+      grams_per_tablespoon = get_weight_from_nutrition_data_response(response) if volumetric
+
+      if nutrients
+        nutrients = response['totalNutrients']
+
+        divisor = grams_per_tablespoon || 1
+        calories = cast_decimal(nutrients.dig('ENERC_KCAL', 'quantity'))
+        calories /= divisor if calories
+        nutrients_data = nutrient_mappings.map do |nutrient, code|
+          nutrient_data = nutrients[code]
+          value =
+            if nutrient_data
+              case nutrient_data['unit']
+              when 'g'
+                cast_decimal(nutrient_data['quantity']) / divisor
+              when 'mg'
+                cast_decimal(nutrient_data['quantity']) / divisor / 1_000
+              when 'µg'
+                cast_decimal(nutrient_data['quantity']) / divisor / 1_000_000
+              end
+            end
+
+          [nutrient, value]
+        end.to_h.merge(calories: calories)
+      end
+
+      data = {
+        food_id: food_id,
+        grams_per_tablespoon: grams_per_tablespoon,
+        health_labels: response['healthLabels'],
+        measurement_units: measurement_units,
+        name: food_data['label']
+      }
+      data[:nutrients] = nutrients_data if nutrients
+
+      data
+    end
+
     def get_grams_per_measurement_unit(food_id:, measurement:)
       data = send_request(
         body: {
@@ -27,82 +104,6 @@ module Edamam
       get_weight_from_nutrition_data_response(data)
     end
 
-    def get_nutrition_data_from_upc(upc)
-      upc_lookup_data = send_request(
-        host: API_HOST,
-        method: :get,
-        name: 'UPC lookup',
-        path: UPC_LOOKUP_PATH,
-        query: { upc: upc }
-      )&.dig('hints', 0)
-
-      return unless upc_lookup_data
-
-      food_data = upc_lookup_data['food']
-      return unless food_data
-
-      food_id = food_data['foodId']
-      name = food_data['label']
-
-      measurement_data = upc_lookup_data['measures']
-      measurement_units = measurement_data.map do |measure|
-        [measure['label'], measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z]+)$/)[1]]
-      end.compact.to_h
-
-      volumetric = measurement_units.key?('Tablespoon')
-      request_data = {
-        body: {
-          ingredients: [
-            {
-              quantity: 1,
-              measureURI: measurement_uri(volumetric ? 'tablespoon' : 'gram'),
-              foodId: food_id
-            }
-          ]
-        }.to_json,
-        headers: { 'Content-Type': 'application/json' },
-        host: API_HOST,
-        method: :post,
-        name: 'nutrition data',
-        path: NUTRITION_DATA_PATH
-      }
-      response = send_request(request_data)
-
-      grams_per_tablespoon = get_weight_from_nutrition_data_response(response) if volumetric
-
-      nutrients = response['totalNutrients']
-      return unless nutrients
-
-      divisor = grams_per_tablespoon || 1
-      calories = cast_decimal(nutrients.dig('ENERC_KCAL', 'quantity'))
-      calories /= divisor if calories
-      nutrients_data = nutrient_mappings.map do |nutrient, code|
-        nutrient_data = nutrients[code]
-        value =
-          if nutrient_data
-            case nutrient_data['unit']
-            when 'g'
-              cast_decimal(nutrient_data['quantity']) / divisor
-            when 'mg'
-              cast_decimal(nutrient_data['quantity']) / divisor / 1_000
-            when 'µg'
-              cast_decimal(nutrient_data['quantity']) / divisor / 1_000_000
-            end
-          end
-
-        [nutrient, value]
-      end.to_h.merge(calories: calories)
-
-      {
-        food_id: food_id,
-        grams_per_tablespoon: grams_per_tablespoon,
-        health_labels: response['healthLabels'],
-        measurement_units: measurement_units,
-        name: name,
-        nutrients: nutrients_data
-      }
-    end
-
     private
 
     def cast_decimal(value)
@@ -121,7 +122,7 @@ module Edamam
     end
 
     def nutrient_mappings
-      {
+      @nutrient_mappings ||= {
         added_sugar: 'SUGAR.added',
         calcium: 'CA',
         carbs: 'CHOCDF',

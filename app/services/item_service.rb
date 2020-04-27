@@ -1,7 +1,37 @@
 class ItemService
+  NUTRITION_DATA_COLLECTION_RETRY_DURATION = 1.month.freeze
+
   class << self
-    def create_item_from_upc(upc)
-      data = Edamam.get_nutrition_data_from_upc(upc)
+    def find_or_create_item_from_upc(upc)
+      item = Item.find_by(upc: upc)
+      if item
+        if item.food_id
+          date = item.nutrition_data_collection_failed_at
+          return item if !date || date > NUTRITION_DATA_COLLECTION_RETRY_DURATION.ago
+
+          create_data_from_fdc(item)
+        else
+          create_data_from_edamam(item)
+        end
+
+        item.reload
+      else
+        new_item = create_data_from_fdc(upc)
+        create_data_from_edamam(new_item.present? ? new_item : upc)
+      end
+    end
+
+    private
+
+    def create_data_from_edamam(value)
+      if value.is_a?(Item)
+        item = value
+        upc = item.upc
+      else
+        upc = value.to_s
+      end
+
+      data = Edamam.get_data_from_upc(upc, nutrients: item.nil?)
       return unless data
 
       health_label_ids = HealthLabel
@@ -17,32 +47,65 @@ class ItemService
       new_measurement_unit_names =
         custom_measurement_unit_names.keys - custom_measurement_units.map(&:name)
 
-      ApplicationRecord.transaction do
-        new_measurement_unit_names.each do |new_measurement_unit_name|
-          custom_measurement_units << MeasurementUnit.create!(
-            name: new_measurement_unit_name,
-            uri_fragment_suffix: custom_measurement_unit_names[new_measurement_unit_name]
+      begin
+        ApplicationRecord.transaction do
+          new_measurement_unit_names.each do |new_measurement_unit_name|
+            custom_measurement_units << MeasurementUnit.create!(
+              name: new_measurement_unit_name,
+              uri_fragment_suffix: custom_measurement_unit_names[new_measurement_unit_name]
+            )
+          end
+
+          item ||= Item.create!(
+            grams_per_tablespoon: data[:grams_per_tablespoon],
+            name: data[:name],
+            upc: upc,
+            **data[:nutrients]
           )
+
+          item.update!(health_label_ids: health_label_ids)
+
+          custom_measurement_units.each do |custom_measurement_unit|
+            ItemMeasurementUnit.create!(
+              grams: Edamam.get_grams_per_measurement_unit(
+                food_id: data[:food_id],
+                measurement: custom_measurement_unit.uri_fragment_suffix
+              ),
+              item: item,
+              measurement_unit_id: custom_measurement_unit.id
+            )
+          end
         end
 
-        item = Item.create!(
-          grams_per_tablespoon: data[:grams_per_tablespoon],
-          health_label_ids: health_label_ids,
-          name: data[:name],
-          upc: upc,
-          **data[:nutrients]
-        )
+        item
+      rescue StandardError
+        nil
+      end
+    end
 
-        custom_measurement_units.each do |custom_measurement_unit|
-          ItemMeasurementUnit.create!(
-            grams: Edamam.get_grams_per_measurement_unit(
-              food_id: data[:food_id],
-              measurement: custom_measurement_unit.uri_fragment_suffix
-            ),
-            item: item,
-            measurement_unit_id: custom_measurement_unit.id
-          )
+    def create_data_from_fdc(value)
+      if value.is_a?(Item)
+        item = value
+        upc = item.upc
+      else
+        upc = value.to_s
+      end
+
+      data = Fdc.get_data_from_upc(upc)
+      unless data
+        item&.update(nutrition_data_collection_failed_at: Time.zone.now)
+        return
+      end
+
+      begin
+        if item
+          item.update!(fdc_id: data[:fdc_id], name: data[:name], **data[:nutrients])
+        else
+          Item.create!(fdc_id: data[:fdc_id], name: data[:name], upc: upc, **data[:nutrients])
         end
+      rescue StandardError
+        item&.update(nutrition_data_collection_failed_at: Time.zone.now)
+        nil
       end
     end
   end

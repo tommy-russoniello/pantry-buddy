@@ -42,13 +42,16 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
     t.decimal "carbs"
     t.decimal "cholesterol"
     t.decimal "fat"
+    t.string "fdc_id"
     t.decimal "fiber"
+    t.string "edamam_id"
     t.decimal "grams_per_tablespoon"
     t.decimal "iron"
     t.decimal "magnesium"
     t.decimal "monounsaturated_fat"
     t.string "name", null: false
     t.decimal "niacin"
+    t.datetime "nutrition_data_collection_failed_at"
     t.decimal "phosphorus"
     t.decimal "polyunsaturated_fat"
     t.decimal "potassium"
@@ -70,7 +73,6 @@ ActiveRecord::Schema.define(version: 2020_04_10_010000) do
     t.decimal "zinc"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["name"], name: "index_items_on_name"
     t.index ["upc"], name: "index_items_on_upc", unique: true
   end
 

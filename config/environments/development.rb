@@ -62,4 +62,5 @@ Rails.application.configure do
 
   ENV['EDAMAM_APP_ID'] = 'd0252925'
   ENV['EDAMAM_APP_KEY'] = 'd07e9bca64f3d9b683208c8de0471722'
+  ENV['FDC_API_KEY'] = 'H50O0dKit8fkvGTFIl0lLEgiGQKTGggc4S7KCF3O'
 end
