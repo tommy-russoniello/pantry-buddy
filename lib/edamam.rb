@@ -19,16 +19,15 @@ module Edamam
       return unless upc_lookup_data
 
       food_data = upc_lookup_data['food']
-      return unless food_data
 
       measurement_data = upc_lookup_data['measures']
       measurement_units = measurement_data.map do |measure|
-        [measure['label'], measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z]+)$/)[1]]
+        [measure['label'], measure['uri'].match(/^#{MEASUREMENT_URI_PREFIX}([a-z_]+)$/)[1]]
       end.compact.to_h
 
       edamam_id = food_data['foodId']
       volumetric = measurement_units.key?('Tablespoon')
-      request_data = {
+      response = send_request(
         body: {
           ingredients: [
             {
@@ -43,19 +42,19 @@ module Edamam
         method: :post,
         name: 'UPC data',
         path: NUTRITION_DATA_PATH
-      }
-      response = send_request(request_data)
+      )
+      return unless response
 
       grams_per_tablespoon = get_weight_from_nutrition_data_response(response) if volumetric
 
       if nutrients
-        nutrients = response['totalNutrients']
+        response_nutrients = response['totalNutrients']
 
         divisor = grams_per_tablespoon || 1
-        calories = cast_decimal(nutrients.dig('ENERC_KCAL', 'quantity'))
+        calories = cast_decimal(response_nutrients.dig(nutrient_mappings[:calories], 'quantity'))
         calories /= divisor if calories
         nutrients_data = nutrient_mappings.map do |nutrient, code|
-          nutrient_data = nutrients[code]
+          nutrient_data = response_nutrients[code]
           value =
             if nutrient_data
               case nutrient_data['unit']
@@ -125,6 +124,7 @@ module Edamam
       @nutrient_mappings ||= {
         added_sugar: 'SUGAR.added',
         calcium: 'CA',
+        calories: 'ENERC_KCAL',
         carbs: 'CHOCDF',
         cholesterol: 'CHOLE',
         fat: 'FAT',
