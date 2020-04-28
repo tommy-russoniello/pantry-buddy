@@ -4,6 +4,7 @@ class EdamamTest < ActiveSupport::TestCase
   def setup
     super
 
+    @edamam_id = 'edamam id'
     @upc = 'upc'
     @upc_lookup_url = "https://#{Edamam::API_HOST}#{Edamam::UPC_LOOKUP_PATH}?" \
       "app_id=#{Edamam::APP_ID}&app_key=#{Edamam::APP_KEY}&upc=#{@upc}"
@@ -13,7 +14,6 @@ class EdamamTest < ActiveSupport::TestCase
 
   tests_for('get data from upc') do
     test('get data from upc - success - not volumetric') do
-      edamam_id = 'edamam id'
       health_labels = %w[dairy_free vegan random]
       measurement_units = { 'name' => 'uri_fragment_suffix' }
       name = 'name'
@@ -47,7 +47,7 @@ class EdamamTest < ActiveSupport::TestCase
           {
             'hints' => [
               {
-                'food' => { 'foodId' => edamam_id, 'label' => name },
+                'food' => { 'foodId' => @edamam_id, 'label' => name },
                 'measures' => measurement_units.map do |unit_name, uri_fragment_suffix|
                   {
                     'label' => unit_name,
@@ -69,7 +69,7 @@ class EdamamTest < ActiveSupport::TestCase
               {
                 quantity: 1,
                 measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}gram",
-                foodId: edamam_id
+                foodId: @edamam_id
               }
             ]
           }.to_json,
@@ -100,7 +100,7 @@ class EdamamTest < ActiveSupport::TestCase
 
       assert_equal(
         {
-          edamam_id: edamam_id,
+          edamam_id: @edamam_id,
           grams_per_tablespoon: nil,
           health_labels: health_labels,
           measurement_units: measurement_units,
@@ -113,7 +113,6 @@ class EdamamTest < ActiveSupport::TestCase
     end
 
     test('get data from upc - success - volumetric') do
-      edamam_id = 'edamam id'
       grams_per_tablespoon = 2.5
       health_labels = %w[dairy_free vegan random]
       measurement_units = { 'Tablespoon' => 'tablespoon', 'name' => 'uri_fragment_suffix' }
@@ -148,7 +147,7 @@ class EdamamTest < ActiveSupport::TestCase
           {
             'hints' => [
               {
-                'food' => { 'foodId' => edamam_id, 'label' => name },
+                'food' => { 'foodId' => @edamam_id, 'label' => name },
                 'measures' => measurement_units.map do |unit_name, uri_fragment_suffix|
                   {
                     'label' => unit_name,
@@ -170,7 +169,7 @@ class EdamamTest < ActiveSupport::TestCase
               {
                 quantity: 1,
                 measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}tablespoon",
-                foodId: edamam_id
+                foodId: @edamam_id
               }
             ]
           }.to_json,
@@ -212,7 +211,7 @@ class EdamamTest < ActiveSupport::TestCase
 
       assert_equal(
         {
-          edamam_id: edamam_id,
+          edamam_id: @edamam_id,
           grams_per_tablespoon: grams_per_tablespoon,
           health_labels: health_labels,
           measurement_units: measurement_units,
@@ -225,7 +224,6 @@ class EdamamTest < ActiveSupport::TestCase
     end
 
     test('get data from upc - success - no nutrients') do
-      edamam_id = 'edamam id'
       health_labels = %w[dairy_free vegan random]
       measurement_units = { 'name' => 'uri_fragment_suffix' }
       name = 'name'
@@ -242,7 +240,7 @@ class EdamamTest < ActiveSupport::TestCase
           {
             'hints' => [
               {
-                'food' => { 'foodId' => edamam_id, 'label' => name },
+                'food' => { 'foodId' => @edamam_id, 'label' => name },
                 'measures' => measurement_units.map do |unit_name, uri_fragment_suffix|
                   {
                     'label' => unit_name,
@@ -264,7 +262,7 @@ class EdamamTest < ActiveSupport::TestCase
               {
                 quantity: 1,
                 measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}gram",
-                foodId: edamam_id
+                foodId: @edamam_id
               }
             ]
           }.to_json,
@@ -274,7 +272,7 @@ class EdamamTest < ActiveSupport::TestCase
 
       assert_equal(
         {
-          edamam_id: edamam_id,
+          edamam_id: @edamam_id,
           grams_per_tablespoon: nil,
           health_labels: health_labels,
           measurement_units: measurement_units,
@@ -283,6 +281,63 @@ class EdamamTest < ActiveSupport::TestCase
         Edamam.get_data_from_upc(@upc),
         'data'
       )
+    end
+
+    test('get data from upc - missing volumetric quantity') do
+      measurement_units = { 'Tablespoon' => 'tablespoon' }
+      name = 'name'
+
+      RestClient::Request
+        .expects(:execute)
+        .with(
+          headers: {},
+          method: :get,
+          payload: nil,
+          url: @upc_lookup_url
+        )
+        .returns(
+          {
+            'hints' => [
+              {
+                'food' => { 'foodId' => @edamam_id, 'label' => name },
+                'measures' => measurement_units.map do |unit_name, uri_fragment_suffix|
+                  {
+                    'label' => unit_name,
+                    'uri' => "#{Edamam::MEASUREMENT_URI_PREFIX}#{uri_fragment_suffix}"
+                  }
+                end
+              }
+            ]
+          }.to_json
+        )
+
+      RestClient::Request
+        .expects(:execute)
+        .with(
+          headers: { 'Content-Type': 'application/json' },
+          method: :post,
+          payload: {
+            ingredients: [
+              {
+                quantity: 1,
+                measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}tablespoon",
+                foodId: @edamam_id
+              }
+            ]
+          }.to_json,
+          url: @nutrition_data_url
+        )
+        .returns(
+          {
+            'ingredients' => [
+              {
+                'parsed' => [{ 'weight' => '0', 'status' => 'MISSING_QUANTITY' }]
+              }
+            ]
+          }.to_json
+        )
+
+      assert_nil(Edamam.get_data_from_upc(@upc), 'data')
     end
 
     test('get data from upc - upc lookup request error') do
@@ -306,8 +361,6 @@ class EdamamTest < ActiveSupport::TestCase
     end
 
     test('get data from upc - nutrition data request error') do
-      edamam_id = 'edamam id'
-
       RestClient::Request
         .expects(:execute)
         .with(
@@ -320,7 +373,7 @@ class EdamamTest < ActiveSupport::TestCase
           {
             'hints' => [
               {
-                'food' => { 'foodId' => edamam_id, 'label' => 'name' },
+                'food' => { 'foodId' => @edamam_id, 'label' => 'name' },
                 'measures' => []
               }
             ]
@@ -342,7 +395,7 @@ class EdamamTest < ActiveSupport::TestCase
               {
                 quantity: 1,
                 measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}gram",
-                foodId: edamam_id
+                foodId: @edamam_id
               }
             ]
           }.to_json,
@@ -371,12 +424,10 @@ class EdamamTest < ActiveSupport::TestCase
     end
 
     test('get data from upc - nutrition data response parse error') do
-      edamam_id = 'edamam id'
-
       upc_lookup_response_body = {
         'hints' => [
           {
-            'food' => { 'foodId' => edamam_id, 'label' => 'name' },
+            'food' => { 'foodId' => @edamam_id, 'label' => 'name' },
             'measures' => []
           }
         ]
@@ -407,7 +458,7 @@ class EdamamTest < ActiveSupport::TestCase
               {
                 quantity: 1,
                 measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}gram",
-                foodId: edamam_id
+                foodId: @edamam_id
               }
             ]
           }.to_json,
@@ -417,6 +468,144 @@ class EdamamTest < ActiveSupport::TestCase
       ActiveSupport::JSON.expects(:decode).with(mock_response).raises(JSON::ParserError)
 
       assert_nil(Edamam.get_data_from_upc(@upc), 'no data')
+    end
+  end
+
+  tests_for('get grams per measurement unit') do
+    test('get grams per measurement unit - success') do
+      name = 'measurement unit'
+      weight = 10.1
+
+      RestClient::Request
+        .expects(:execute)
+        .with(
+          headers: { 'Content-Type': 'application/json' },
+          method: :post,
+          payload: {
+            ingredients: [
+              {
+                quantity: 1,
+                measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}#{name.tr(' ', '_')}",
+                foodId: @edamam_id
+              }
+            ]
+          }.to_json,
+          url: @nutrition_data_url
+        )
+        .returns(
+          {
+            'ingredients' => [
+              {
+                'parsed' => [{ 'weight' => weight.to_s, 'status' => 'ok' }]
+              }
+            ]
+          }.to_json
+        )
+
+      assert_equal(
+        weight,
+        Edamam.get_grams_per_measurement_unit(edamam_id: @edamam_id, measurement: name),
+        'grams'
+      )
+    end
+
+    test('get grams per measurement unit - missing quantity') do
+      name = 'measurement unit'
+
+      RestClient::Request
+        .expects(:execute)
+        .with(
+          headers: { 'Content-Type': 'application/json' },
+          method: :post,
+          payload: {
+            ingredients: [
+              {
+                quantity: 1,
+                measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}#{name.tr(' ', '_')}",
+                foodId: @edamam_id
+              }
+            ]
+          }.to_json,
+          url: @nutrition_data_url
+        )
+        .returns(
+          {
+            'ingredients' => [
+              {
+                'parsed' => [{ 'weight' => '0', 'status' => 'MISSING_QUANTITY' }]
+              }
+            ]
+          }.to_json
+        )
+
+      assert_nil(
+        Edamam.get_grams_per_measurement_unit(edamam_id: @edamam_id, measurement: name),
+        'grams'
+      )
+    end
+
+    test('get grams per measurement unit - request error') do
+      name = 'measurement unit'
+
+      error_message = 'error message'
+      error = RestClient::ExceptionWithResponse.new(
+        ActiveSupport::JSON.encode(message: error_message, success: false)
+      )
+
+      RestClient::Request
+        .expects(:execute)
+        .with(
+          headers: { 'Content-Type': 'application/json' },
+          method: :post,
+          payload: {
+            ingredients: [
+              {
+                quantity: 1,
+                measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}#{name.tr(' ', '_')}",
+                foodId: @edamam_id
+              }
+            ]
+          }.to_json,
+          url: @nutrition_data_url
+        )
+        .raises(error)
+
+      Rails.logger.expects(:error).with("Edamam measurement data error: #{error_message}")
+
+      assert_nil(
+        Edamam.get_grams_per_measurement_unit(edamam_id: @edamam_id, measurement: name),
+        'grams'
+      )
+    end
+
+    test('get grams per measurement unit - response parse error') do
+      name = 'measurement unit'
+      mock_response = mock
+
+      RestClient::Request
+        .expects(:execute)
+        .with(
+          headers: { 'Content-Type': 'application/json' },
+          method: :post,
+          payload: {
+            ingredients: [
+              {
+                quantity: 1,
+                measureURI: "#{Edamam::MEASUREMENT_URI_PREFIX}#{name.tr(' ', '_')}",
+                foodId: @edamam_id
+              }
+            ]
+          }.to_json,
+          url: @nutrition_data_url
+        )
+        .returns(mock_response)
+
+      ActiveSupport::JSON.expects(:decode).with(mock_response).raises(JSON::ParserError)
+
+      assert_nil(
+        Edamam.get_grams_per_measurement_unit(edamam_id: @edamam_id, measurement: name),
+        'grams'
+      )
     end
   end
 end

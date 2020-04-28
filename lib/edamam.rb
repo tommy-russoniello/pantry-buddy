@@ -45,7 +45,10 @@ module Edamam
       )
       return unless response
 
-      grams_per_tablespoon = get_weight_from_nutrition_data_response(response) if volumetric
+      if volumetric
+        grams_per_tablespoon = get_weight_from_nutrition_data_response(response)
+        return unless grams_per_tablespoon
+      end
 
       if nutrients
         response_nutrients = response['totalNutrients']
@@ -100,6 +103,8 @@ module Edamam
         name: 'measurement data',
         path: NUTRITION_DATA_PATH
       )
+      return unless data
+
       get_weight_from_nutrition_data_response(data)
     end
 
