@@ -33,6 +33,7 @@ module Fdc
             nutrient_data['value']
           end
 
+        # The FDC API returns nutrient values based on 100 grams of the item
         value /= 100 if value
         [nutrient, value]
       end.compact.sort_by(&:first).to_h

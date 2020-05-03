@@ -12,36 +12,37 @@ class Item < ApplicationRecord
   static_attribute :upc
 
   def self.nutrients
-    %i[
-      added_sugar
-      calcium
-      calories
-      carbs
-      cholesterol
-      fat
-      fiber
-      iron
-      magnesium
-      monounsaturated_fat
-      niacin
-      phosphorus
-      polyunsaturated_fat
-      potassium
-      protein
-      riboflavin
-      saturated_fat
-      sodium
-      sugar
-      thiamin
-      trans_fat
-      vitamin_a
-      vitamin_b6
-      vitamin_b12
-      vitamin_c
-      vitamin_d
-      vitamin_e
-      vitamin_k
-    ]
+    @nutrients ||=
+      %i[
+        added_sugar
+        calcium
+        calories
+        carbs
+        cholesterol
+        fat
+        fiber
+        iron
+        magnesium
+        monounsaturated_fat
+        niacin
+        phosphorus
+        polyunsaturated_fat
+        potassium
+        protein
+        riboflavin
+        saturated_fat
+        sodium
+        sugar
+        thiamin
+        trans_fat
+        vitamin_a
+        vitamin_b6
+        vitamin_b12
+        vitamin_c
+        vitamin_d
+        vitamin_e
+        vitamin_k
+      ]
   end
 
   nutrients.each do |nutrient|

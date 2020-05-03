@@ -24,12 +24,13 @@ class ItemService
     private
 
     def create_data_from_edamam(value)
-      if value.is_a?(Item)
-        item = value
-        upc = item.upc
-      else
-        upc = value.to_s
-      end
+      upc =
+        if value.is_a?(Item)
+          item = value
+          item.upc
+        else
+          value
+        end
 
       data = Edamam.get_data_from_upc(upc, nutrients: item.nil?)
       return unless data
@@ -56,7 +57,7 @@ class ItemService
             )
           end
 
-          item ||= Item.create!(
+          item ||= Item.new(
             name: data[:name],
             upc: upc,
             **data[:nutrients]
@@ -86,12 +87,13 @@ class ItemService
     end
 
     def create_data_from_fdc(value)
-      if value.is_a?(Item)
-        item = value
-        upc = item.upc
-      else
-        upc = value.to_s
-      end
+      upc =
+        if value.is_a?(Item)
+          item = value
+          item.upc
+        else
+          value
+        end
 
       data = Fdc.get_data_from_upc(upc)
       unless data
