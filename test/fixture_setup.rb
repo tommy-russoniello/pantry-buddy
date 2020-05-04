@@ -34,10 +34,10 @@ module FixtureSetup
       # will mark the attribute as dirty and validation will fail. In this case,
       # `changed?` will return `true`.
       #
-      # We also need to check if the model was destroyed (for models that don't
-      # have a status) because the model can be destroyed without any of the
-      # attributes being changed. When this happens, the model will be frozen
-      # which will cause errors if we try to modify the model in another test.
+      # We also need to check if the model was destroyed because the model
+      # can be destroyed without any of the attributes being changed. When
+      # this happens, the model will be frozen which will cause errors if
+      # we try to modify the model in another test.
       #
       # We also need to check if there are any errors left on the model. When there
       # is a validation on a model checking the data type of an attribute's value
