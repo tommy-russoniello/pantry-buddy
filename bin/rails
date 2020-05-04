@@ -6,4 +6,20 @@ rescue LoadError => e
 end
 APP_PATH = File.expand_path('../config/application', __dir__)
 require_relative '../config/boot'
+
+if ARGV.first == 'test'
+  # Run Rubocop before the tests
+  if ARGV.size == 1
+    require_relative '../config/application'
+    Rails.application.load_tasks
+    Rake::Task[:rubocop].invoke
+  end
+
+  require_relative '../test/test_helper.rb'
+  require 'rails/commands/test/test_command.rb'
+
+  # This is asynchronous and will return immediately
+  Rails::Command::TestCommand.perform('test', [], {})
+end
+
 require 'rails/commands'

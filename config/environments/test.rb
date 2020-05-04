@@ -45,4 +45,8 @@ Rails.application.configure do
 
   # Raises error for missing translations.
   # config.action_view.raise_on_missing_translations = true
+
+  ENV['EDAMAM_APP_ID'] = 'fake_edamam_app_id'
+  ENV['EDAMAM_APP_KEY'] = 'fake_edamam_app_key'
+  ENV['FDC_API_KEY'] = 'fake_fdc_api_key'
 end
